@@ -1,13 +1,13 @@
 {
 	"name": "blix_svelvet",
-	"version": "8.0.10",
+	"version": "1.0.0",
 	"description": "A lightweight Svelte component library for building dynamic, node-based user interfaces",
 	"keywords": [
 		"svelte",
 		"svelvet",
 		"typescript"
 	],
-	"authors": "SpanishInquisition,Aaron, Abhi, Alexander, Ali, Andrew, Anu, Brian, Britta, Christopher, Damian, David, Dillon, Emma, Ernesto, Horacio, Ian, Jeffrey, Jen, Johnny, Justin, Mauricio, Michael, Rachel, Rathna, Ruxin, Ryan, Sam, Samee, Taylor, Thomas, Timmy, Tony, Von, Walter, Wesley",
+	"authors": "SpanishInquisition",
 	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/The-SpanishInquisition/Svelvet/issues"
