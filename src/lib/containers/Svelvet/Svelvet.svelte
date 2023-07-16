@@ -98,7 +98,7 @@
 		disconnection: SvelvetConnectionEvent;
 	}>();
 
-	let graph: GraphType;
+	export let graph: GraphType;
 	let direction: 'TD' | 'LR' = TD ? 'TD' : 'LR';
 
 	setContext('snapTo', snapTo);
