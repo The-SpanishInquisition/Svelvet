@@ -278,10 +278,18 @@
 			<slot {grabHandle} {selected} {destroy} />
 		{/if}
 
-		<div id={`anchors-west-${node.id}`} class="anchors left" />
-		<div id={`anchors-east-${node.id}`} class="anchors right" />
-		<div id={`anchors-north-${node.id}`} class="anchors top" />
-		<div id={`anchors-south-${node.id}`} class="anchors bottom" />
+		<div id={`anchors-west-${node.id}`} class="anchors left">
+			<slot name="anchorWest" />
+		</div>
+		<div id={`anchors-east-${node.id}`} class="anchors right">
+			<slot name="anchorEast" />
+		</div>
+		<div id={`anchors-north-${node.id}`} class="anchors top">
+			<slot name="anchorNorth" />
+		</div>
+		<div id={`anchors-south-${node.id}`} class="anchors bottom">
+			<slot name="anchorSouth" />
+		</div>
 	</div>
 {/if}
 
@@ -315,6 +323,7 @@
 		color: var(--prop-text-color, var(--text-color, var(--default-text-color)));
 		box-shadow: 0 0 0 var(--final-border-width) var(--final-border-color),
 			var(--default-node-shadow);
+		font-family: 'Roboto', sans-serif;
 	}
 	.anchors {
 		/* outline: solid 1px red; */

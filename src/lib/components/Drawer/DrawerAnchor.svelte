@@ -2,12 +2,15 @@
 	import { writable } from 'svelte/store';
 	import type { CSSColorString, Direction, AnchorProps, AnchorDrawerConfig } from '$lib/types';
 	import { addProps } from '$lib/utils';
+	import type { ComponentType } from 'svelte';
+	import Icon from '$lib/assets/icons/Icon.svelte';
 
-	// External stores
-	export const anchorPropsStore = writable<(AnchorDrawerConfig | object)[][]>([]);
-
-	// Local stores
-	const anchorCounter = writable<number>(0);
+	// Local stores for anchor counts
+	const leftAnchorCounter = writable<number>(0);
+	const rightAnchorCounter = writable<number>(0);
+	const topAnchorCounter = writable<number>(0);
+	const bottomAnchorCounter = writable<number>(0);
+	const selfAnchorCounter = writable<number>(0);
 
 	// Props for anchor creation
 	let invisible: boolean | undefined;
@@ -21,15 +24,26 @@
 	let anchorLocked: boolean | undefined;
 	let anchorBgColor: CSSColorString | undefined;
 	let directionValue: HTMLElement;
+	let edgeProps: ComponentType | undefined = undefined;
 
-	// Array of props for pending anchors
-	let anchorsCreated: (AnchorDrawerConfig | object)[] = [];
+	// Array of props for pending anchors based on direction
+	let anchorsCreated: { [key: string]: AnchorDrawerConfig[] } = {
+		self: [],
+		left: [],
+		right: [],
+		top: [],
+		bottom: []
+	};
 
-	// Creates props and adds to store, returns true if anchor was created
-	export const createAnchorProps = (createAnchors: boolean): boolean => {
+	// Creates props and adds to corresponding anchor direction
+	export const createAnchorProps = (
+		createAnchors: boolean,
+		anchorPosition?: string
+	): { [key: string]: AnchorDrawerConfig[] } | undefined => {
 		if (direction == '') direction = undefined;
+
 		// Object that stores properties for the created anchor
-		const anchorProps: AnchorDrawerConfig | object = {};
+		const anchorProps: AnchorDrawerConfig = {};
 		// Array of property names and values for anchor
 		const anchorPropNames: string[] = [
 			'invisible',
@@ -41,7 +55,8 @@
 			'dynamic',
 			'edgeLabel',
 			'locked',
-			'bgColor'
+			'bgColor',
+			'edge'
 		];
 		const anchorPropsArray: AnchorProps = [
 			invisible,
@@ -53,61 +68,77 @@
 			dynamic,
 			anchorEdgeLabel,
 			anchorLocked,
-			anchorBgColor
+			anchorBgColor,
+			edgeProps
 		];
 
 		// Adds props to anchor if they exist
 		addProps(anchorPropNames, anchorPropsArray, anchorProps);
-		// If props were created add anchorProps object to store
+		// If props were, returns a copy of anchorsCreated or adds props to the corresponding direction
 		if (Object.keys(anchorProps).length) {
 			if (createAnchors) {
-				anchorPropsStore.update((anchors) => [...anchors, [...anchorsCreated]]);
-				return true;
+				return {
+					self: [...anchorsCreated.self],
+					left: [...anchorsCreated.left],
+					right: [...anchorsCreated.right],
+					top: [...anchorsCreated.top],
+					bottom: [...anchorsCreated.bottom]
+				};
 			}
-			anchorsCreated.push(anchorProps);
-			return true;
+			if (anchorPosition === 'addLeftAnchor') anchorsCreated.left.push(anchorProps);
+			else if (anchorPosition === 'addRightAnchor') anchorsCreated.right.push(anchorProps);
+			else if (anchorPosition === 'addTopAnchor') anchorsCreated.top.push(anchorProps);
+			else if (anchorPosition === 'addBottomAnchor') anchorsCreated.bottom.push(anchorProps);
+			else if (anchorPosition === 'addSelfAnchor') anchorsCreated.self.push(anchorProps);
 		}
-		return false;
+		return;
 	};
 
 	//Button Clicks for Anchors
-	const handleAnchorLockedButtonClick = (e: any) => {
-		// const target = e.target as HTMLButtonElement;
-		anchorLocked = e.target.checked;
+	const handleAnchorLockedButtonClick = (e: Event) => {
+		const target = e.target as HTMLInputElement;
+		anchorLocked = target.checked;
 	};
 
-	const handleInvisibleButtonClick = (e: any) => {
-		invisible = e.target.checked;
+	const handleInvisibleButtonClick = (e: Event) => {
+		const target = e.target as HTMLInputElement;
+		invisible = target.checked;
 	};
 
-	const handleNodeConnectButtonClick = (e: any) => {
-		nodeConnect = e.target.checked;
+	const handleNodeConnectButtonClick = (e: Event) => {
+		const target = e.target as HTMLInputElement;
+		nodeConnect = target.checked;
 	};
 
-	const handleInputButtonClick = (e: any) => {
-		input = e.target.checked;
+	const handleInputButtonClick = (e: Event) => {
+		const target = e.target as HTMLInputElement;
+		input = target.checked;
 	};
 
-	const handleOutputButtonClick = (e: any) => {
-		output = e.target.checked;
+	const handleOutputButtonClick = (e: Event) => {
+		const target = e.target as HTMLInputElement;
+		output = target.checked;
 	};
 
-	const handleMultipleButtonClick = (e: any) => {
-		multiple = e.target.checked;
+	const handleMultipleButtonClick = (e: Event) => {
+		const target = e.target as HTMLInputElement;
+		multiple = target.checked;
 	};
 
-	const handleDynamicButtonClick = (e: any) => {
-		dynamic = e.target.checked;
+	const handleDynamicButtonClick = (e: Event) => {
+		const target = e.target as HTMLInputElement;
+		dynamic = target.checked;
 	};
 
-	const handleDirectionButtonClick = (e: any) => {
-		if (e.target.value == '') direction = undefined;
+	const handleDirectionButtonClick = (e: Event) => {
+		const target = e.target as HTMLSelectElement;
+		if (target.value == '') direction = undefined;
 		else {
-			direction = e.target.value;
+			direction = target.value as Direction | undefined;
 		}
 	};
-
-	const handleAnchorResetButtonClick = (e: any) => {
+	// Reset props, pending anchors, and counters for position of anchors
+	const handleAnchorResetButtonClick = (e: Event) => {
 		invisible = undefined;
 		nodeConnect = undefined;
 		input = undefined;
@@ -118,20 +149,53 @@
 		anchorEdgeLabel = undefined;
 		anchorLocked = undefined;
 		anchorBgColor = undefined;
-		anchorsCreated = [];
+		anchorsCreated.left = [];
+		anchorsCreated.right = [];
+		anchorsCreated.top = [];
+		anchorsCreated.bottom = [];
+		anchorsCreated.self = [];
 
-		anchorCounter.set(anchorsCreated.length);
-		if (e) e.target.reset();
+		selfAnchorCounter.set(0);
+		leftAnchorCounter.set(0);
+		rightAnchorCounter.set(0);
+		topAnchorCounter.set(0);
+		bottomAnchorCounter.set(0);
+		const formElement = e.target as HTMLFormElement;
+		if (e) formElement.reset();
 	};
-
-	const addAnchor = () => {
-		createAnchorProps(false);
-		anchorCounter.set(anchorsCreated.length);
+	// Adds anchor based on the id of the button clicked
+	const addAnchor = (e: Event) => {
+		const formEvent = e.target as HTMLFormElement;
+		const addAnchorID = formEvent?.parentElement?.id || formEvent?.id;
+		createAnchorProps(false, addAnchorID);
+		if (addAnchorID === 'addLeftAnchor') leftAnchorCounter.set(anchorsCreated.left.length);
+		else if (addAnchorID === 'addRightAnchor') rightAnchorCounter.set(anchorsCreated.right.length);
+		else if (addAnchorID === 'addTopAnchor') topAnchorCounter.set(anchorsCreated.top.length);
+		else if (addAnchorID === 'addBottomAnchor')
+			bottomAnchorCounter.set(anchorsCreated.bottom.length);
+		else if (addAnchorID === 'addSelfAnchor') selfAnchorCounter.set(anchorsCreated.self.length);
 	};
+	// Deletes anchor based on the id of the button clicked
+	const deleteAnchor = (e: Event) => {
+		const formEvent = e.target as HTMLFormElement;
+		const deleteAnchorID = formEvent?.parentElement?.id || formEvent?.id;
 
-	const deleteAnchor = () => {
-		anchorsCreated.pop();
-		if (anchorsCreated.length === 0) anchorCounter.set(anchorsCreated.length);
+		if (deleteAnchorID === 'deleteLeftAnchor') {
+			anchorsCreated.left.pop();
+			leftAnchorCounter.set(anchorsCreated.left.length);
+		} else if (deleteAnchorID === 'deleteRightAnchor') {
+			anchorsCreated.right.pop();
+			rightAnchorCounter.set(anchorsCreated.right.length);
+		} else if (deleteAnchorID === 'deleteTopAnchor') {
+			anchorsCreated.top.pop();
+			topAnchorCounter.set(anchorsCreated.top.length);
+		} else if (deleteAnchorID === 'deleteBottomAnchor') {
+			anchorsCreated.bottom.pop();
+			bottomAnchorCounter.set(anchorsCreated.bottom.length);
+		} else if (deleteAnchorID === 'deleteSelfAnchor') {
+			anchorsCreated.self.pop();
+			selfAnchorCounter.set(anchorsCreated.self.length);
+		}
 	};
 </script>
 
@@ -222,11 +286,57 @@
 			<li class="list-item">
 				<label for="addAnchors"> Add Anchors: </label>
 				<button class="deleteAnchor" type="button" on:click|stopPropagation={deleteAnchor}>
-					<span class="material-symbols-outlined"> arrow_left </span>
+					<Icon icon="arrow_left" />
 				</button>
-				<span class="list-item counter">{$anchorCounter}</span>
+				<!-- anchorCounter does not exist -->
+				<!-- <span class="list-item counter">{$anchorCounter}</span> -->
 				<button class="addAnchor" type="button" on:click|stopPropagation={addAnchor}>
-					<span class="material-symbols-outlined"> arrow_right </span>
+					<Icon icon="arrow_right" />
+				</button>
+			</li>
+			<li class="list-item anchor-directions">
+				<p>Left</p>
+				<p>Right</p>
+			</li>
+			<li class="list-item anchor-directions">
+				<button id="deleteLeftAnchor" class="deleteAnchor" type="button" on:click={deleteAnchor}>
+					<Icon icon="arrow_left" />
+				</button>
+				<span class="list-item couter">{$leftAnchorCounter}</span>
+				<button
+					id="addLeftAnchor"
+					class="addAnchor middle-arrow"
+					type="button"
+					on:click={addAnchor}
+				>
+					<Icon icon="arrow_right" />
+				</button>
+				<button id="deleteRightAnchor" class="deleteAnchor" type="button" on:click={deleteAnchor}>
+					<Icon icon="arrow_left" />
+				</button>
+				<span class="list-item couter">{$rightAnchorCounter}</span>
+				<button id="addRightAnchor" class="addAnchor" type="button" on:click={addAnchor}>
+					<Icon icon="arrow_right" />
+				</button>
+			</li>
+			<li class="list-item anchor-directions">
+				<p>Top</p>
+				<p>Bottom</p>
+			</li>
+			<li class="list-item anchor-directions">
+				<button id="deleteTopAnchor" class="deleteAnchor" type="button" on:click={deleteAnchor}>
+					<Icon icon="arrow_left" />
+				</button>
+				<span class="list-item couter">{$topAnchorCounter}</span>
+				<button id="addTopAnchor" class="addAnchor middle-arrow" type="button" on:click={addAnchor}>
+					<Icon icon="arrow_right" />
+				</button>
+				<button id="deleteBottomAnchor" class="deleteAnchor" type="button" on:click={deleteAnchor}>
+					<Icon icon="arrow_left" />
+				</button>
+				<span class="list-item couter">{$bottomAnchorCounter}</span>
+				<button id="addBottomAnchor" class="addAnchor" type="button" on:click={addAnchor}>
+					<Icon icon="arrow_right" />
 				</button>
 			</li>
 			<li class="list-item">
@@ -292,8 +402,8 @@
 	.deleteAnchor {
 		border: none;
 		cursor: pointer;
-		padding: 5px;
 		border-radius: 8px;
+		padding: 5px;
 		color: var(
 			--prop-drawer-reset-button-text-color,
 			var(--drawer-reset-button-text-color, var(--default-reset-drawer-button-text-color))
@@ -321,12 +431,12 @@
 		);
 	}
 
-	.counter {
+	/* .counter {
 		display: inline-block;
 		width: 15px;
 		margin: 0 10px;
 		font-size: 18px;
-	}
+	} */
 
 	.anchorResetBtn {
 		color: var(
@@ -353,5 +463,16 @@
 			--prop-drawer-reset-button-hover-color,
 			var(--drawer-reset-button-hover-color, var(--default-drawer-reset-button-hover-color))
 		);
+	}
+
+	.anchor-directions {
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+		margin: 0;
+	}
+
+	.middle-arrow {
+		margin-right: 10%;
 	}
 </style>

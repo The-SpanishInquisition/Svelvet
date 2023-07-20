@@ -110,6 +110,8 @@
 		const nodeCount = graph.nodes.count() + 1;
 
 		isDefault = !$$slots.default;
+		if ($$slots.anchorWest || $$slots.anchorEast || $$slots.anchorNorth || $$slots.anchorSouth)
+			isDefault = false;
 
 		const initialDimensions: InitialDimensions = dimensions
 			? dimensions
@@ -159,6 +161,8 @@
 
 		graph.nodes.add(node, node.id);
 	});
+
+	$: node && node.connections.set(connections);
 
 	onDestroy(() => {
 		graph.nodes.delete(node.id);
@@ -285,7 +289,14 @@
 		let:grabHandle
 	>
 		<slot {selected} {grabHandle} {disconnect} {connect} {node} {destroy}>
-			<DefaultNode {selected} on:connection on:disconnection />
+			{#if isDefault}
+				<DefaultNode {selected} on:connection on:disconnection />
+			{/if}
 		</slot>
+
+		<slot name="anchorWest" slot="anchorWest" />
+		<slot name="anchorEast" slot="anchorEast" />
+		<slot name="anchorNorth" slot="anchorNorth" />
+		<slot name="anchorSouth" slot="anchorSouth" />
 	</InternalNode>
 {/if}

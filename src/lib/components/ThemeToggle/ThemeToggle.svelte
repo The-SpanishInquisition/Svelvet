@@ -5,14 +5,16 @@
 	export let main = 'light';
 	export let alt = 'dark';
 	/**
+	 * @deprecated
 	 * @default 'light_mode'
-	 * @description This prop accepts a string that corresponds to the the name of an icon from the Material Icons library.
+	 * @description (Do not use. Will be deprecated in the next major release.) This prop accepts a string that corresponds to the the name of an icon from the Material Icons library.
 	 * @link https://fonts.google.com/icons
 	 */
 	export let mainIcon = 'light_mode';
 	/**
+	 * @deprecated
 	 * @default 'dark_mode'
-	 * @description This prop accepts a string that corresponds to the the name of an icon from the Material Icons library.
+	 * @description (Do not use. Will be deprecated in the next major release.) This prop accepts a string that corresponds to the the name of an icon from the Material Icons library.
 	 *  @link https://fonts.google.com/icons
 	 */
 	export let altIcon = 'dark_mode';
@@ -50,6 +52,14 @@
 </div>
 
 <style>
+	@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0');
+
+	span {
+		font-family: 'Material Symbols Outlined';
+		font-size: 1.2rem;
+		color: inherit;
+	}
+
 	* {
 		box-sizing: border-box;
 	}
@@ -112,7 +122,6 @@
 		font-family: 'Material Symbols Outlined';
 		font-size: 1.2rem;
 		color: inherit;
-		max-width: 20px;
 	}
 	button:last-child {
 		border-bottom: none;
