@@ -10,14 +10,14 @@
 
 	let animationFrameId: number;
 
-	function moveEdge(edgeElement: SVGElement) {
+	function moveEdge(edgeElement: SVGElement, graphId: string) {
 		const parentNode = edgeElement.parentNode;
 		if (!parentNode) return;
 		// Remove the anchor from its current container
 		parentNode.removeChild(edgeElement);
 
 		// Add the anchor to the new container
-		const newContainer = document.querySelector(`.svelvet-graph-wrapper`);
+		const newContainer = document.querySelector(`#svelvet-graph-wrapper-${graphId}`);
 		if (!newContainer) return;
 		newContainer.appendChild(edgeElement);
 	}
@@ -51,6 +51,8 @@
 	export let textColor: CSSColorString | null = null;
 	export let cornerRadius = 8;
 	export let targetColor: CSSColorString | null = null;
+
+	export let graphId: string; //Used when calling moveEdge() to move the edge to the correct graph wrapper
 
 	// External stores
 	const source = edge.source;
@@ -189,7 +191,7 @@
 				labelPoint = calculatePath(DOMPath, labelPosition);
 			}
 		}, 0);
-		moveEdge(edgeElement);
+		moveEdge(edgeElement, graphId);
 	});
 
 	afterUpdate(() => {

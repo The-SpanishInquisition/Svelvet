@@ -1,6 +1,6 @@
 {
 	"name": "blix_svelvet",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "A lightweight Svelte component library for building dynamic, node-based user interfaces",
 	"keywords": [
 		"svelte",
@@ -59,6 +59,7 @@
 		"prettier-plugin-svelte": "^2.10.1",
 		"publint": "^0.1.12",
 		"svelte-check": "^3.4.3",
+		"svelte-splitpanes": "^0.8.0",
 		"tslib": "^2.5.3",
 		"typescript": "^5.1.6",
 		"vite": "^4.3.9",

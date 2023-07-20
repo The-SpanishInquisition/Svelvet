@@ -39,6 +39,7 @@
 	on:click|preventDefault|self
 	on:touchstart|preventDefault|self
 	style:transform
+	id={`svelvet-graph-wrapper-${graph.id}`}
 	class="svelvet-graph-wrapper"
 	role="presentation"
 >

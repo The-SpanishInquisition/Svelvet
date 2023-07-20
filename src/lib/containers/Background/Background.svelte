@@ -3,6 +3,7 @@
 	import { getContext } from 'svelte';
 	import type { Graph, CSSColorString } from '$lib/types';
 	import type { BackgroundStyles } from '$lib/types/general';
+	import { get } from 'svelte/store';
 
 	const graph = getContext<Graph>('graph');
 
@@ -64,7 +65,7 @@
 	<svg>
 		<defs>
 			<pattern
-				id="graph-pattern"
+				id={'graph-pattern-' + graph.id}
 				x={backgroundOffsetX}
 				y={backgroundOffsetY}
 				width={gridScale}
@@ -103,7 +104,7 @@
 
 			{#if majorGrid > 0}
 				<pattern
-					id="graph-coarse-pattern"
+					id={'graph-coarse-pattern-' + graph.id}
 					x={backgroundOffsetX}
 					y={backgroundOffsetY}
 					width={gridScale * majorGrid}
@@ -141,12 +142,12 @@
 				</pattern>
 			{/if}
 		</defs>
-		<rect width="100%" height="100%" fill="url(#graph-pattern)" opacity={gridOpacity} />
+		<rect width="100%" height="100%" fill="url(#graph-pattern-{graph.id})" opacity={gridOpacity} />
 		{#if majorGrid > 0}
 			<rect
 				width="100%"
 				height="100%"
-				fill="url(#graph-coarse-pattern)"
+				fill="url(#graph-coarse-pattern-{graph.id})"
 				opacity={majorGridOpacity}
 			/>
 		{/if}

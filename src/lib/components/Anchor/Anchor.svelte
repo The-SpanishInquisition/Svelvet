@@ -629,7 +629,7 @@
 				{#if CustomEdge}
 					<CustomEdge />
 				{:else}
-					<Edge />
+					<Edge graphId={graph.id} />
 				{/if}
 			</slot>
 		</EdgeContext>
@@ -645,7 +645,7 @@
 				{#if CustomEdge}
 					<CustomEdge />
 				{:else}
-					<Edge />
+						<Edge graphId={graph.id} />
 				{/if}
 			</slot>
 		</EdgeContext>

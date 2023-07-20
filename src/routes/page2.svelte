@@ -2,7 +2,9 @@
 	import { Svelvet, Node, Anchor, type Graph } from '$lib';
 	import Connector from '../example-components/Connector.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle/ThemeToggle.svelte';
+	import { Splitpanes, Pane } from 'svelte-splitpanes';
 	import { get } from 'svelte/store';
+	import Background from '$lib/containers/Background/Background.svelte';
 
 	function addAndConnect(connect: (connections: string | number) => void) {
 		connect(totalNodes + 4);
@@ -24,62 +26,65 @@
 			{JSON.stringify($zoom)}
 		{/if}
 	{/key}
-	<table>
-		<tr>
-			<td>
-				<Svelvet minimap title="test" bind:graph={graphData}>
-					<Connector />
-					<Node bgColor="red" inputs={4} position={{ x: 600, y: 200 }}>
-						<button on:click={() => widthCount++} />
-						{#each { length: widthCount } as item}
-							<div>Height</div>
-						{/each}
-					</Node>
-					<Node inputs={5} position={{ x: 600, y: 600 }} />
-					<Node useDefaults dimensions={{ width: 400, height: 300 }} position={{ x: 100, y: 300 }}>
-						<div class="anchor">
-							<Anchor nodeConnect />
-						</div>
-						<Anchor nodeConnect />
-					</Node>
-					{#each { length: totalNodes } as node}
-						<Node
-							let:connect
-							useDefaults
-							position={{ x: Math.random() * 200, y: Math.random() * 400 }}
-						/>
+	<Splitpanes on:resize={() => window.dispatchEvent(new Event('resize'))}>
+		<Pane>
+			<Svelvet
+				id="asdf"
+				minimap
+				title="test"
+				snapTo={10}
+				bind:graph={graphData}
+				on:edgeDrop={(e) => console.log('EDGE DROP', e)}
+			>
+				<!-- on:connection={(e) => console.log('CONNECTION', e)} -->
+				<!-- on:disconnection={(e) => console.log('DISCONNECTION', e)} -->
+				<Connector />
+				<Node bgColor="red" inputs={4} position={{ x: 600, y: 200 }}>
+					<button on:click={() => widthCount++} />
+					{#each { length: widthCount } as item}
+						<div>Height</div>
 					{/each}
-					<ThemeToggle slot="toggle" />
-				</Svelvet>
-			</td>
-			<td>
-				<Svelvet minimap title="test">
-					<Connector />
-					<Node bgColor="red" inputs={4} position={{ x: 600, y: 200 }}>
-						<button on:click={() => widthCount++} />
-						{#each { length: widthCount } as item}
-							<div>Height</div>
-						{/each}
-					</Node>
-					<Node inputs={5} position={{ x: 600, y: 600 }} />
-					<Node useDefaults dimensions={{ width: 400, height: 300 }} position={{ x: 100, y: 300 }}>
-						<div class="anchor">
-							<Anchor nodeConnect />
-						</div>
+				</Node>
+				<Node inputs={5} position={{ x: 600, y: 600 }} />
+				<Node useDefaults dimensions={{ width: 400, height: 300 }} position={{ x: 100, y: 300 }}>
+					<div class="anchor">
 						<Anchor nodeConnect />
-					</Node>
-					{#each { length: totalNodes } as node}
-						<Node
-							let:connect
-							useDefaults
-							position={{ x: Math.random() * 200, y: Math.random() * 400 }}
-						/>
-					{/each}
-					<ThemeToggle slot="toggle" />
-				</Svelvet>
-			</td>
-		</tr>
-	</table>
+					</div>
+					<Anchor nodeConnect />
+				</Node>
+				{#each { length: totalNodes } as node}
+					<Node
+						let:connect
+						useDefaults
+						position={{ x: Math.random() * 200, y: Math.random() * 400 }}
+					/>
+				{/each}
+				<ThemeToggle slot="toggle" />
+				<Background dotColor="red" slot="background" />
+			</Svelvet>
+		</Pane>
+		<Pane>
+			<Svelvet id="asdf2" minimap title="test" snapTo={10}>
+				<Connector />
+				<Node inputs={5} position={{ x: 600, y: 600 }} />
+				<Node useDefaults dimensions={{ width: 400, height: 300 }} position={{ x: 100, y: 300 }}>
+					<div class="anchor">
+						<Anchor nodeConnect id="a1"/>
+					</div>
+					<Anchor nodeConnect id="a2" />
+				</Node>
+				{#each { length: totalNodes } as node}
+					<Node
+						let:connect
+						useDefaults
+						position={{ x: Math.random() * 200, y: Math.random() * 400 }}
+					/>
+				{/each}
+				<ThemeToggle slot="toggle" />
+				<Background dotColor="blue" slot="background" />
+			</Svelvet>
+		</Pane>
+	</Splitpanes>
 </body>
 
 <style>

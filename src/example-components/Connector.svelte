@@ -6,9 +6,11 @@
 		totalNodes++;
 	}
 	let totalNodes = 0;
+	const id = Math.round(Math.random()*1000) + "";
 </script>
 
 <Node
+	{id}
 	position={{ x: 100, y: 300 }}
 	dimensions={{ width: 400, height: 300 }}
 	let:connect
