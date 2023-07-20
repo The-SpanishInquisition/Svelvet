@@ -100,7 +100,8 @@ Svelvet is the wrapping parent component that renders out nodes and edges. It is
 </ResponseField>
 
 <ResponseField name="modifier" type="'alt' | 'ctrl' | 'meta' | 'shift'" default="meta">
-	Sets global key modifier used to detect select all and duplicate events.
+	Sets global key modifier used to detect select alhttps://www.artstation.com/artwork/9EkOANl and
+	duplicate events.
 </ResponseField>
 
 <ResponseField name="trackpadPan" type="boolean" default="false">
@@ -110,6 +111,14 @@ Svelvet is the wrapping parent component that renders out nodes and edges. It is
 </ResponseField>
 
 ## Events
+
+<ResponseField name="on:connection">
+	Fires when the user drags an Edge which successfully connects two anchors.
+</ResponseField>
+
+<ResponseField name="on:disconnection">
+	Fires when the user disconnects an edisting Edge between two anchors.
+</ResponseField>
 
 <ResponseField name="on:edgeDrop">
 	Fires when an Edge connection is started and not completed. Does not fire on drops after a
