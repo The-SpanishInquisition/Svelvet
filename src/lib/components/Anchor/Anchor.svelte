@@ -360,6 +360,7 @@
 
 		const connectingType = $connectingFrom.anchor.type;
 
+		// If connecting to self or type mismatch, cancel connection
 		if ($connectingFrom.anchor === anchor || (connectingType === anchor.type && connectingType)) {
 			clearLinking(false);
 			return;
@@ -645,7 +646,7 @@
 				{#if CustomEdge}
 					<CustomEdge />
 				{:else}
-						<Edge graphId={graph.id} />
+					<Edge graphId={graph.id} />
 				{/if}
 			</slot>
 		</EdgeContext>

@@ -87,6 +87,12 @@ export function createEdgeStore(): EdgeStore {
 			});
 			return deleted;
 		},
+		deleteAll: () => {
+			for (const key of Array.from(data.keys())) {
+				if (key === 'cursor') continue;
+				store.delete(key);
+			}
+		},
 		onEdgeChange: (
 			subscriber: (edge: WritableEdge, type: 'connection' | 'disconnection') => void
 		) => {

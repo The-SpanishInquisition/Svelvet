@@ -2,13 +2,14 @@
 	import Graph from '../Graph/Graph.svelte';
 	import FlowChart from '$lib/components/FlowChart/FlowChart.svelte';
 	import { createEventDispatcher, onMount, setContext } from 'svelte';
-	import { createGraph } from '$lib/utils/';
+	import { createEdge, createGraph } from '$lib/utils/';
 	import { graphStore } from '$lib/stores';
 	import { reloadStore } from '$lib/utils/savers/reloadStore';
 	import type { ComponentType } from 'svelte';
-	import type { Graph as GraphType, EdgeStyle, XYPair, SvelvetConnectionEvent } from '$lib/types';
+	import type { Graph as GraphType, EdgeStyle, XYPair, SvelvetConnectionEvent, EdgeConfig, CustomWritable, AnchorKey } from '$lib/types';
 	import type { NodeConfig, GraphKey, CSSColorString, NodeKey } from '$lib/types';
 	import type { Node, Anchor } from '$lib/types';
+	import { writable, type Readable, type Writable, get } from 'svelte/store';
 </script>
 
 <script lang="ts">
@@ -162,6 +163,53 @@
 		if (!edgeKey) return;
 		graph.edges.delete(edgeKey[0]);
 	}
+
+	//========== OVERRIDDEN STUFF FOR BLIX ==========//
+	export const clearAllGraphEdges = () => {
+		graph.edges.deleteAll();
+	}
+
+	// Try connect any two arbitrary anchors with an edge
+	export const connectAnchorIds = (sourceNode: NodeKey, sourceAnchor: AnchorKey, targetNode: NodeKey, targetAnchor: AnchorKey) => {
+		const srcNode = graph?.nodes.get(sourceNode);
+		const tgtNode = graph?.nodes.get(targetNode);
+
+		const srcAnchor = srcNode?.anchors.get(`${sourceAnchor}/${sourceNode}`);
+		const tgtAnchor = tgtNode?.anchors.get(`${targetAnchor}/${targetNode}`);
+
+		if (!srcAnchor || !tgtAnchor) return false;
+
+		const success = connectAnchors(srcAnchor, tgtAnchor);
+
+		if (success) { connectStores(); }
+		return success;
+	}
+
+	// Updates the connected anchors set on source and target
+	// Creates the edge and add it to the store
+	function connectAnchors(source: Anchor, target: Anchor) {
+		// Don't connect an anchor to itself
+		if (source === target) return false;
+
+		// Don't connect if the anchors are already connected
+		if (get(source.connected).has(target) || get(target.connected).has(source)) return false;
+
+		// TODO: Get the edge label from the source node
+		const edgeConfig: EdgeConfig = {
+			color: source.edgeColor,
+			label: { text: "" }
+		};
+
+		if (edgeStyle) edgeConfig.type = edgeStyle;
+		const newEdge = createEdge({ source, target }, source?.edge || null, edgeConfig);
+		if (!source.node || !target.node) return false;
+		edgeStore.add(newEdge, new Set([source, target, source.node, target.node]));
+		return true;
+	}
+
+	// See Anchor.svelte for implementation, don't think we'll need it for blix
+	// so just gonna stub it
+	function connectStores() { return }
 </script>
 
 {#if graph}

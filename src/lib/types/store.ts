@@ -18,6 +18,7 @@ export interface Store<T, K> {
 export interface EdgeStore {
 	count: () => number;
 	delete: (key: CustomEdgeKey) => boolean;
+	deleteAll: () => void;
 	get: (key: CustomEdgeKey) => WritableEdge | null;
 	getAll: () => WritableEdge[];
 	match: (...args: Array<Node | Anchor | null>) => CustomEdgeKey[];

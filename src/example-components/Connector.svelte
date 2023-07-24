@@ -6,7 +6,7 @@
 		totalNodes++;
 	}
 	let totalNodes = 0;
-	const id = Math.round(Math.random()*1000) + "";
+	const id = Math.round(Math.random() * 1000) + '';
 </script>
 
 <Node
