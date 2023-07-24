@@ -6,7 +6,15 @@
 	import { graphStore } from '$lib/stores';
 	import { reloadStore } from '$lib/utils/savers/reloadStore';
 	import type { ComponentType } from 'svelte';
-	import type { Graph as GraphType, EdgeStyle, XYPair, SvelvetConnectionEvent, EdgeConfig, CustomWritable, AnchorKey } from '$lib/types';
+	import type {
+		Graph as GraphType,
+		EdgeStyle,
+		XYPair,
+		SvelvetConnectionEvent,
+		EdgeConfig,
+		CustomWritable,
+		AnchorKey
+	} from '$lib/types';
 	import type { NodeConfig, GraphKey, CSSColorString, NodeKey } from '$lib/types';
 	import type { Node, Anchor } from '$lib/types';
 	import { writable, type Readable, type Writable, get } from 'svelte/store';
@@ -167,10 +175,15 @@
 	//========== OVERRIDDEN STUFF FOR BLIX ==========//
 	export const clearAllGraphEdges = () => {
 		graph.edges.deleteAll();
-	}
+	};
 
 	// Try connect any two arbitrary anchors with an edge
-	export const connectAnchorIds = (sourceNode: NodeKey, sourceAnchor: AnchorKey, targetNode: NodeKey, targetAnchor: AnchorKey) => {
+	export const connectAnchorIds = (
+		sourceNode: NodeKey,
+		sourceAnchor: AnchorKey,
+		targetNode: NodeKey,
+		targetAnchor: AnchorKey
+	) => {
 		const srcNode = graph?.nodes.get(sourceNode);
 		const tgtNode = graph?.nodes.get(targetNode);
 
@@ -181,9 +194,11 @@
 
 		const success = connectAnchors(srcAnchor, tgtAnchor);
 
-		if (success) { connectStores(); }
+		if (success) {
+			connectStores();
+		}
 		return success;
-	}
+	};
 
 	// Updates the connected anchors set on source and target
 	// Creates the edge and add it to the store
@@ -197,7 +212,7 @@
 		// TODO: Get the edge label from the source node
 		const edgeConfig: EdgeConfig = {
 			color: source.edgeColor,
-			label: { text: "" }
+			label: { text: '' }
 		};
 
 		if (edgeStyle) edgeConfig.type = edgeStyle;
@@ -209,7 +224,9 @@
 
 	// See Anchor.svelte for implementation, don't think we'll need it for blix
 	// so just gonna stub it
-	function connectStores() { return }
+	function connectStores() {
+		return;
+	}
 </script>
 
 {#if graph}

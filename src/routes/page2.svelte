@@ -37,7 +37,12 @@
 		{ id: 4 } // conns: writable([]), },
 	];
 
-	let connectAnchorIds: (sourceNode: NodeKey, sourceAnchor: AnchorKey, targetNode: NodeKey, targetAnchor: AnchorKey) => boolean;
+	let connectAnchorIds: (
+		sourceNode: NodeKey,
+		sourceAnchor: AnchorKey,
+		targetNode: NodeKey,
+		targetAnchor: AnchorKey
+	) => boolean;
 	let clearAllGraphEdges: () => void;
 
 	function addRandomConn() {
@@ -47,7 +52,7 @@
 
 		if (connectAnchorIds) {
 			const res = connectAnchorIds(`N-n-${node1}`, `A-a-${node1}`, `N-n-${node2}`, `A-a-${node2}`);
-			console.log("RES", res);
+			console.log('RES', res);
 		}
 	}
 
@@ -106,12 +111,11 @@
 				title="test"
 				snapTo={10}
 				bind:graph={graphData}
-				bind:connectAnchorIds={connectAnchorIds}
-				bind:clearAllGraphEdges={clearAllGraphEdges}
+				bind:connectAnchorIds
+				bind:clearAllGraphEdges
 			>
 				<!-- Special anchor for accessing connection functions -->
-				<div class="hidden">
-				</div>
+				<div class="hidden" />
 				{#each nodes as node}
 					<!-- {#key resetGraph} -->
 					<Node
