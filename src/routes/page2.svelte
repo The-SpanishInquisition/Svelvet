@@ -81,8 +81,6 @@
 				snapTo={10}
 				on:edgeDrop={(e) => console.log('EDGE DROP', e)}
 			>
-				<!-- on:connection={(e) => console.log('CONNECTION', e)} -->
-				<!-- on:disconnection={(e) => console.log('DISCONNECTION', e)} -->
 				<Connector />
 				<Node bgColor="red" inputs={4} position={{ x: 600, y: 200 }}>
 					<button on:click={() => widthCount++} />
@@ -114,6 +112,8 @@
 				bind:connectAnchorIds
 				bind:clearAllGraphEdges
 			>
+				<!-- on:connection={(e) => console.log('CONNECTION', e)} -->
+				<!-- on:disconnection={(e) => console.log('DISCONNECTION', e)} -->
 				<!-- Special anchor for accessing connection functions -->
 				<div class="hidden" />
 				{#each nodes as node}

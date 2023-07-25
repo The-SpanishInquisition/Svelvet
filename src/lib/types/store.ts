@@ -17,8 +17,8 @@ export interface Store<T, K> {
 
 export interface EdgeStore {
 	count: () => number;
-	delete: (key: CustomEdgeKey) => boolean;
-	deleteAll: () => void;
+	delete: (key: CustomEdgeKey, silent?: boolean) => boolean;
+	deleteAll: (silent?: boolean) => void;
 	get: (key: CustomEdgeKey) => WritableEdge | null;
 	getAll: () => WritableEdge[];
 	match: (...args: Array<Node | Anchor | null>) => CustomEdgeKey[];
@@ -26,7 +26,7 @@ export interface EdgeStore {
 	subscribe: Writable<Map<CustomEdgeKey, WritableEdge>>['subscribe'];
 	update: Writable<Map<CustomEdgeKey, WritableEdge>>['update'];
 	set: Writable<Map<CustomEdgeKey, WritableEdge>>['set'];
-	add: (item: WritableEdge, key: CustomEdgeKey) => void;
+	add: (item: WritableEdge, key: CustomEdgeKey, silent?: boolean) => void;
 	onEdgeChange: (
 		callback: (edge: WritableEdge, type: 'connection' | 'disconnection') => void
 	) => void;

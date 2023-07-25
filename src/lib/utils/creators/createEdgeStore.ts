@@ -15,7 +15,9 @@ export function createEdgeStore(): EdgeStore {
 		subscribe,
 		set,
 		update,
-		add: (item: WritableEdge, key: CustomEdgeKey) => {
+		add: (item: WritableEdge, key: CustomEdgeKey, silent?: boolean) => {
+			silent ??= false;
+
 			if (typeof key !== 'string') {
 				const elements = Array.from(key as Set<Node | Anchor>);
 				const anchor1 = elements[0] as Anchor;
@@ -24,7 +26,9 @@ export function createEdgeStore(): EdgeStore {
 				anchor2.connected.update((anchors) => anchors.add(anchor1));
 				if (store.match(...Array.from(key as Set<Node | Anchor>)).length) return;
 
-				subscribersOnChange.forEach((subscriber) => subscriber(item, 'connection'));
+				if (!silent) {
+					subscribersOnChange.forEach((subscriber) => subscriber(item, 'connection'));
+				}
 			}
 
 			update((currentData) => {
@@ -60,7 +64,8 @@ export function createEdgeStore(): EdgeStore {
 			// return matches.map((key) => data.get(key) as WritableEdge);
 			return data.get(match) || null;
 		},
-		delete: (key: CustomEdgeKey) => {
+		delete: (key: CustomEdgeKey, silent?: boolean) => {
+			silent ??= false;
 			if (typeof key !== 'string') {
 				const elements = Array.from(key as Set<Node | Anchor>);
 
@@ -81,16 +86,17 @@ export function createEdgeStore(): EdgeStore {
 				if (!edge) return currentData;
 				currentData.delete(key);
 				deleted = true;
-				if (typeof key !== 'string')
+				if (typeof key !== 'string' && !silent)
 					subscribersOnChange.forEach((subscriber) => subscriber(edge, 'disconnection'));
 				return currentData;
 			});
 			return deleted;
 		},
-		deleteAll: () => {
+		deleteAll: (silent?: boolean) => {
+			silent ??= false;
 			for (const key of Array.from(data.keys())) {
 				if (key === 'cursor') continue;
-				store.delete(key);
+				store.delete(key, silent);
 			}
 		},
 		onEdgeChange: (

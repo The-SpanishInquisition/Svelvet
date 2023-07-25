@@ -174,7 +174,7 @@
 
 	//========== OVERRIDDEN STUFF FOR BLIX ==========//
 	export const clearAllGraphEdges = () => {
-		graph.edges.deleteAll();
+		graph.edges.deleteAll(true);
 	};
 
 	// Try connect any two arbitrary anchors with an edge
@@ -218,7 +218,7 @@
 		if (edgeStyle) edgeConfig.type = edgeStyle;
 		const newEdge = createEdge({ source, target }, source?.edge || null, edgeConfig);
 		if (!source.node || !target.node) return false;
-		edgeStore.add(newEdge, new Set([source, target, source.node, target.node]));
+		edgeStore.add(newEdge, new Set([source, target, source.node, target.node]), true);
 		return true;
 	}
 
