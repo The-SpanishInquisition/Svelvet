@@ -23,7 +23,7 @@
 	export let size = 200;
 	export let parameterStore: CustomWritable<CSSColorString>;
 
-	let { pickerX, pickerY } = colorToPickerXY($parameterStore, size);
+	$: ({ pickerX, pickerY } = colorToPickerXY($parameterStore, size));
 
 	let picker: HTMLDivElement;
 	let picking = false;
