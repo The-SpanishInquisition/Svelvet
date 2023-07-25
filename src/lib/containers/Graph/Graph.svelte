@@ -269,7 +269,17 @@
 	}
 
 	function onMouseDown(e: MouseEvent) {
-		if (e.button === 2) return;
+		if (e.button === 0) {
+			dispatch('leftClick');
+		} else if (e.button === 2) {
+			const { x, y } = e;
+			const { top, left } = dimensions;
+			dispatch('rightClick', {
+				cursorPos: { x: e.clientX, y: e.clientY },
+				canvasPos: { x: x - left, y: y - top }
+			});
+			return;
+		}
 		if ($graphDOMElement) $graphDOMElement.focus();
 
 		const { clientX, clientY } = e;

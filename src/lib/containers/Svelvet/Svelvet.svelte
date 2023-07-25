@@ -248,6 +248,8 @@
 		{modifier}
 		{title}
 		on:edgeDrop
+		on:rightClick
+		on:leftClick
 	>
 		{#if mermaid.length}
 			<FlowChart {mermaid} {mermaidConfig} />

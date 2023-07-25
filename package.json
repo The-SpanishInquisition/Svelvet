@@ -1,6 +1,6 @@
 {
 	"name": "blix_svelvet",
-	"version": "1.0.4",
+	"version": "1.0.6",
 	"description": "A lightweight Svelte component library for building dynamic, node-based user interfaces",
 	"keywords": [
 		"svelte",
@@ -376,6 +376,7 @@
 		"xmlchars": "^2.2.0",
 		"yallist": "^4.0.0",
 		"yaml": "^1.10.2",
+		"yarn": "^1.22.19",
 		"yocto-queue": "^0.1.0"
 	},
 	"author": "spanish inquisition"
