@@ -9,7 +9,13 @@ import { createBoundsStore } from './createBoundsStore';
 import type { GraphConfig } from '$lib/types';
 import { calculateViewportCenter } from '../calculators/calculateViewPortCenter';
 
-export function createGraph(id: GraphKey, config: GraphConfig): Graph {
+export type DataTypeChecker = (sourceType: string, targetType: string) => boolean;
+
+export function createGraph(
+	id: GraphKey,
+	config: GraphConfig,
+	typeChecker?: DataTypeChecker
+): Graph {
 	const { zoom, editable, translation: initialTranslation, direction, locked, edge } = config;
 
 	const translation = writable({
@@ -42,6 +48,7 @@ export function createGraph(id: GraphKey, config: GraphConfig): Graph {
 		dimensions,
 		bounds,
 		center,
+		dataTypeChecker: typeChecker || null,
 		mounted,
 		direction: direction || 'LR',
 		editable: editable || false,

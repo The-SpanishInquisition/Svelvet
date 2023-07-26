@@ -36,7 +36,9 @@
 	}
 
 	.connecting {
-		background-color: var(--anchor-connecting, var(--default-anchor-connecting));
+		/* background-color: var(--anchor-connecting, var(--default-anchor-connecting)); */
+		/* filter: brightness(1.2); */
+		outline: 1px solid var(--prop-anchor-color);
 		box-shadow: 0 0 0px 1px var(--anchor-connecting-border, var(--default-anchor-connecting-border));
 	}
 

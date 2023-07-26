@@ -33,7 +33,7 @@
 	export let edge: WritableEdge = getContext<WritableEdge>('edge');
 	export let straight = edgeStyle === 'straight';
 	export let step = edgeStyle === 'step';
-	export let animate = false;
+	// export let animate = false;
 	export let label = '';
 	export let enableHover = false;
 	export let edgeClick: null | (() => void) = null;
@@ -85,8 +85,10 @@
 
 	// Reactive declarations
 	$: dynamic = $sourceDynamic || $targetDynamic;
-	$: edgeColor = source?.edgeColor || target?.edgeColor || null;
+	// $: edgeColor = source?.edgeColor || target?.edgeColor || null;
+	$: edgeColor = edge.color;
 	$: edgeLabel = edge.label?.text;
+	$: edgeAnimate = edge.animated;
 	$: finalColor = color || $edgeColor || null;
 	$: labelText = label || $edgeLabel || '';
 	$: renderLabel = labelText || $$slots.label; // Boolean that determines whether or not to render the label
@@ -322,7 +324,7 @@
 			<path
 				id={edgeKey}
 				class="edge"
-				class:animate
+				class:animate={$edgeAnimate}
 				d={path}
 				style:--prop-edge-color={finalColor}
 				style:--prop-stroke-width={width ? width + 'px' : null}

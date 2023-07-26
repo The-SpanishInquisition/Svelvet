@@ -15,6 +15,7 @@ export function createAnchor(
 	store: Anchor['store'],
 	edge: ComponentType | null,
 	type: 'input' | 'output' | null,
+	dataType?: string,
 	direction?: Direction,
 	dynamic?: boolean,
 	key?: string | number | null,
@@ -32,6 +33,8 @@ export function createAnchor(
 		x: x - nodePosition.x + width / 2,
 		y: y - nodePosition.y + height / 2
 	});
+
+	const dataTypeStore = writable<string>(dataType || '');
 
 	// Create derived stores for the anchor X and Y positions based on the node position and the offset
 	const anchorPosition = derived([node.position, offset], ([$position, $offset]) => {
@@ -77,6 +80,7 @@ export function createAnchor(
 		direction: directionStore,
 		dynamic: writable(dynamic || false),
 		type,
+		dataType: dataTypeStore,
 		edge,
 		moving,
 		mounted: writable(false),

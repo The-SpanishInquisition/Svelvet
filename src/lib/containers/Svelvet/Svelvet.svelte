@@ -2,7 +2,7 @@
 	import Graph from '../Graph/Graph.svelte';
 	import FlowChart from '$lib/components/FlowChart/FlowChart.svelte';
 	import { createEventDispatcher, onMount, setContext } from 'svelte';
-	import { createEdge, createGraph } from '$lib/utils/';
+	import { createEdge, createGraph, type DataTypeChecker } from '$lib/utils/';
 	import { graphStore } from '$lib/stores';
 	import { reloadStore } from '$lib/utils/savers/reloadStore';
 	import type { ComponentType } from 'svelte';
@@ -102,6 +102,8 @@
 	 */
 	export let fixedZoom = false;
 
+	export let dataTypeChecker: DataTypeChecker | null = null;
+
 	const dispatch = createEventDispatcher<{
 		connection: SvelvetConnectionEvent;
 		disconnection: SvelvetConnectionEvent;
@@ -124,7 +126,11 @@
 		} else {
 			let graphKey: GraphKey = `G-${id || graphStore.count() + 1}`;
 
-			graph = createGraph(graphKey, { zoom, direction, editable, locked, translation });
+			graph = createGraph(
+				graphKey,
+				{ zoom, direction, editable, locked, translation },
+				dataTypeChecker || undefined
+			);
 
 			graphStore.add(graph, graphKey);
 		}

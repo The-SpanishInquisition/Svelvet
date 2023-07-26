@@ -6,7 +6,17 @@
 	import { writable, get } from 'svelte/store';
 	import { createEdge, createAnchor, generateOutput } from '$lib/utils/creators';
 	import { createEventDispatcher } from 'svelte';
-	import type { Graph, Node, Connections, CSSColorString, EdgeStyle, EdgeConfig } from '$lib/types';
+	import type {
+		Graph,
+		Node,
+		Connections,
+		CSSColorString,
+		EdgeStyle,
+		EdgeConfig,
+		WritableEdge,
+		CustomEdgeKey,
+		EdgeStore
+	} from '$lib/types';
 	import type {
 		Anchor,
 		Direction,
@@ -71,10 +81,7 @@
 	export let key: string | number | null = null;
 	export let outputStore: OutputStore | null = null;
 	export let connections: Connections = [];
-	export let edgeColor:
-		| Writable<CSSColorString | null>
-		| CustomWritable<CSSColorString>
-		| Readable<CSSColorString> = writable(null);
+	export let edgeColor: Writable<CSSColorString | null> = writable(bgColor);
 	export let edgeLabel = '';
 	/**
 	 * @default 'false'
@@ -98,6 +105,7 @@
 	export let direction: Direction =
 		graphDirection === 'TD' ? (input ? 'north' : 'south') : input ? 'west' : 'east';
 	export let title = '';
+	export let dataType = '';
 
 	const dispatchConnection = createEventDispatcher<{ connection: AnchorConnectionEvent }>();
 	const dispatchDisconnection = createEventDispatcher();
@@ -129,12 +137,18 @@
 		inputsStore || outputStore || null,
 		edge || nodeEdge || graphEdge || null,
 		type,
+		dataType,
 		direction,
 		dynamic,
 		key,
 		edgeColor
 	);
 	anchors.add(anchor, anchor.id);
+
+	// Update exported `dataType` when the anchor is updated
+	anchor.dataType.subscribe((value) => {
+		dataType = value;
+	});
 
 	onMount(() => {
 		if (anchorElement) anchor.recalculatePosition();
@@ -316,8 +330,46 @@
 		connectEdge(e);
 	}
 
+	$: handleHoveringChanged(hovering);
+
+	function handleHoveringChanged(hovering: boolean) {
+		const cursorEdge = edgeStore.get('cursor');
+		if (!cursorEdge) return;
+
+		if (hovering) {
+			// Cannot connect inputs to inputs / outputs to outputs
+			if (anchor.type === cursorAnchor.type) {
+				cursorEdge.color.set('red');
+				cursorEdge.animated.set(true);
+				cursorEdge.label?.text.set('');
+				return;
+			}
+
+			const compatible = input
+				? checkEdgeDataTypesCompatible(cursorAnchor, anchor)
+				: checkEdgeDataTypesCompatible(anchor, cursorAnchor);
+
+			if (!compatible) {
+				cursorEdge.color.set('red');
+				cursorEdge.animated.set(true);
+				cursorEdge.label?.text.set('Type mismatch');
+			}
+		} else {
+			// cursorEdge.color.set(get(cursorAnchor.edgeColor));
+			cursorEdge.color.set(get(cursorAnchor.edgeColor));
+			cursorEdge.animated.set(false);
+			cursorEdge.label?.text.set('');
+		}
+	}
+
 	// This can be condensed
 	function startEdge() {
+		// cursor edge color should always be the color
+		// of the node we dragged from
+		cursorAnchor.edgeColor = writable(get(edgeColor));
+		cursorAnchor.dataType = anchor.dataType;
+		cursorAnchor.type = anchor.type;
+
 		if (input === output) {
 			$connectingFrom = { anchor, store: null, key: null };
 			createCursorEdge(anchor, cursorAnchor);
@@ -340,7 +392,7 @@
 
 	function createCursorEdge(source: Anchor, target: Anchor, disconnect = false) {
 		const edgeConfig: EdgeConfig = {
-			color: edgeColor,
+			color: writable(get(cursorAnchor.edgeColor)),
 			label: { text: edgeLabel }
 		};
 
@@ -391,6 +443,21 @@
 		attemptConnection(source, target, e);
 	}
 
+	// Verifies whether two anchors' data types match
+	// An optional `checker` function can be provided to override default behaviour
+	function checkEdgeDataTypesCompatible(source: Anchor, target: Anchor) {
+		if (!source || !target) return false;
+
+		const dataTypeA = get(source.dataType)?.split(/\s+/).join(' ');
+		const dataTypeB = get(target.dataType)?.split(/\s+/).join(' ');
+
+		if (!dataTypeA || !dataTypeB) return false;
+
+		if (graph.dataTypeChecker) return graph.dataTypeChecker(dataTypeA, dataTypeB);
+
+		return dataTypeA === '' || dataTypeB === '' || dataTypeA === dataTypeB;
+	}
+
 	// Updates the connected anchors set on source and target
 	// Creates the edge and add it to the store
 	function connectAnchors(source: Anchor, target: Anchor) {
@@ -398,10 +465,14 @@
 		if (source === target) return false;
 		// Don't connect if the anchors are already connected
 		if (get(source.connected).has(anchor)) return false;
+
 		const edgeConfig: EdgeConfig = {
-			color: edgeColor,
+			color: source.edgeColor,
 			label: { text: edgeLabel }
 		};
+
+		// Don't connect if the anchors are of different types
+		if (!checkEdgeDataTypesCompatible(source, target)) return false;
 
 		if (edgeStyle) edgeConfig.type = edgeStyle;
 		const newEdge = createEdge({ source, target }, source?.edge || null, edgeConfig);

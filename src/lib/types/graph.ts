@@ -17,6 +17,7 @@ import type {
 } from '.';
 import type { ComponentType } from 'svelte';
 import type { createBoundsStore } from '$lib/utils/creators/createBoundsStore';
+import type { DataTypeChecker } from '$lib/utils';
 
 export interface Graph {
 	id: GraphKey;
@@ -26,6 +27,7 @@ export interface Graph {
 	bounds: ReturnType<typeof createBoundsStore>;
 	mounted: Writable<boolean>;
 	center: Readable<XYPair>;
+	dataTypeChecker: DataTypeChecker | null;
 	maxZIndex: Writable<number>;
 	dimensions: Writable<GraphDimensions>;
 	editable: boolean;

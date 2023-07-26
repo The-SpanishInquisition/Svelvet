@@ -22,13 +22,11 @@ export interface Anchor {
 	rotation: Readable<number>;
 	recalculatePosition: () => void;
 	type: InputType;
+	dataType: Writable<string>;
 	mounted: Writable<boolean>;
 	inputKey: string | number | null;
 	moving: Readable<boolean>;
-	edgeColor:
-		| Writable<CSSColorString | null>
-		| CustomWritable<CSSColorString>
-		| Readable<CSSColorString>;
+	edgeColor: Writable<CSSColorString | null>;
 	// An associated data store if provided
 	store:
 		| Writable<Record<string, Writable<unknown> | Readable<unknown>>>

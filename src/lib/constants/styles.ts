@@ -2,7 +2,7 @@ import type { CSSColorString, EdgeStyle, PixelValue } from '$lib/types';
 
 export const EDGE_LABEL_BORDER_RADIUS = 10;
 export const EDGE_LABEL_WIDTH = 100;
-export const EDGE_LABEL_HEIGHT = 50;
+export const EDGE_LABEL_HEIGHT = 30;
 export const EDGE_LABEL_COLOR: CSSColorString = '#000';
 export const EDGE_LABEL_TEXT_COLOR: CSSColorString = '#fff';
 export const EDGE_LABEL_FONT_SIZE: PixelValue = '12px';

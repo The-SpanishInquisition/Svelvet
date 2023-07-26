@@ -19,10 +19,7 @@ export type WritableEdge = {
 	source: Anchor | CursorAnchor;
 	target: Anchor | CursorAnchor;
 	type: Writable<EdgeStyle | null>;
-	color:
-		| Writable<CSSColorString | null>
-		| CustomWritable<CSSColorString>
-		| Readable<CSSColorString>;
+	color: Writable<CSSColorString | null>;
 	width: Writable<number>;
 	label?: EdgeLabel;
 	animated: Writable<boolean>;
@@ -76,10 +73,7 @@ export interface EdgeLabel {
 
 export interface EdgeConfig {
 	type?: EdgeStyle;
-	color?:
-		| Writable<CSSColorString | null>
-		| CustomWritable<CSSColorString>
-		| Readable<CSSColorString>;
+	color?: Writable<CSSColorString | null>;
 	width?: number;
 	label?: EdgeLabelConfig;
 	animated?: boolean;
