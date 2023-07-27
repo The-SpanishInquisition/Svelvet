@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
 	import Graph from '../Graph/Graph.svelte';
 	import FlowChart from '$lib/components/FlowChart/FlowChart.svelte';
-	import { createEventDispatcher, onMount, setContext } from 'svelte';
+	import { createEventDispatcher, onDestroy, onMount, setContext } from 'svelte';
 	import { createEdge, createGraph, type DataTypeChecker } from '$lib/utils/';
 	import { graphStore } from '$lib/stores';
 	import { reloadStore } from '$lib/utils/savers/reloadStore';
@@ -136,6 +136,17 @@
 		}
 	});
 
+	let edgeEventsSilenced = false;
+	onDestroy(() => {
+		// When the entire svelvet context is being destroyed, we block all edge events from firing
+		// This onDestroy() should always be called before child onDestroy()'s
+		// See [https://svelte.dev/repl/b1459369e2af4d2a8f5e51d3e74299c9]
+		edgeEventsSilenced = true;
+	});
+	const checkEdgeEventsSilenced = () => {
+		return edgeEventsSilenced;
+	};
+
 	$: backgroundExists = $$slots.background;
 
 	$: edgeStore = graph && graph.edges;
@@ -144,12 +155,14 @@
 
 	$: if (edgeStore) {
 		edgeStore.onEdgeChange((edge, type) => {
-			dispatch(type, {
-				sourceAnchor: edge.source as Anchor,
-				targetAnchor: edge.target as Anchor,
-				sourceNode: edge.source.node as Node,
-				targetNode: edge.target.node as Node
-			});
+			if (!checkEdgeEventsSilenced()) {
+				dispatch(type, {
+					sourceAnchor: edge.source as Anchor,
+					targetAnchor: edge.target as Anchor,
+					sourceNode: edge.source.node as Node,
+					targetNode: edge.target.node as Node
+				});
+			}
 		});
 	}
 
