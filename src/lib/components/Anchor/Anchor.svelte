@@ -448,10 +448,8 @@
 	function checkEdgeDataTypesCompatible(source: Anchor, target: Anchor) {
 		if (!source || !target) return false;
 
-		const dataTypeA = get(source.dataType)?.split(/\s+/).join(' ');
-		const dataTypeB = get(target.dataType)?.split(/\s+/).join(' ');
-
-		if (!dataTypeA || !dataTypeB) return false;
+		const dataTypeA = get(source.dataType)?.trim().split(/\s+/).join(' ') || '';
+		const dataTypeB = get(target.dataType)?.trim().split(/\s+/).join(' ') || '';
 
 		if (graph.dataTypeChecker) return graph.dataTypeChecker(dataTypeA, dataTypeB);
 
