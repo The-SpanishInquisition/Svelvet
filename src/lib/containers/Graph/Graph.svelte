@@ -478,6 +478,20 @@
 			activeIntervals[key] = interval;
 		}
 	}
+
+	const clientWidth = writable<number>(0);
+	const clientHeight = writable<number>(0);
+
+	$: if ($clientWidth) {
+		tick().then(() => {
+			updateGraphDimensions();
+		});
+	}
+	$: if ($clientHeight) {
+		tick().then(() => {
+			updateGraphDimensions();
+		});
+	}
 </script>
 
 <!-- <button on:click={() => getJSONState(graph)}>SAVE STATE</button> -->
@@ -495,6 +509,8 @@
 	on:touchstart|preventDefault|self={onTouchStart}
 	on:keydown={handleKeyDown}
 	on:keyup={handleKeyUp}
+	bind:clientWidth={$clientWidth}
+	bind:clientHeight={$clientHeight}
 	bind:this={$graphDOMElement}
 	tabindex={0}
 >
