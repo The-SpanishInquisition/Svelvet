@@ -279,8 +279,8 @@
 		attemptConnection(anchor, connectingAnchor, e);
 	}
 
-	function attemptConnection(source: Anchor, target: Anchor, e: MouseEvent | TouchEvent) {
-		const success = connectAnchors(source, target);
+	async function attemptConnection(source: Anchor, target: Anchor, e: MouseEvent | TouchEvent) {
+		const success = await connectAnchors(source, target);
 
 		if (success) {
 			connectStores();
@@ -332,7 +332,7 @@
 
 	$: handleHoveringChanged(hovering);
 
-	function handleHoveringChanged(hovering: boolean) {
+	async function handleHoveringChanged(hovering: boolean) {
 		const cursorEdge = edgeStore.get('cursor');
 		if (!cursorEdge) return;
 
@@ -346,8 +346,8 @@
 			}
 
 			const compatible = input
-				? checkEdgeDataTypesCompatible(cursorAnchor, anchor)
-				: checkEdgeDataTypesCompatible(anchor, cursorAnchor);
+				? await checkEdgeDataTypesCompatible(cursorAnchor, anchor)
+				: await checkEdgeDataTypesCompatible(anchor, cursorAnchor);
 
 			if (!compatible) {
 				cursorEdge.color.set('red');
@@ -445,20 +445,20 @@
 
 	// Verifies whether two anchors' data types match
 	// An optional `checker` function can be provided to override default behaviour
-	function checkEdgeDataTypesCompatible(source: Anchor, target: Anchor) {
+	async function checkEdgeDataTypesCompatible(source: Anchor, target: Anchor): Promise<boolean> {
 		if (!source || !target) return false;
 
 		const dataTypeA = get(source.dataType)?.trim().split(/\s+/).join(' ') || '';
 		const dataTypeB = get(target.dataType)?.trim().split(/\s+/).join(' ') || '';
 
-		if (graph.dataTypeChecker) return graph.dataTypeChecker(dataTypeA, dataTypeB);
+		if (graph.dataTypeChecker) return await graph.dataTypeChecker(dataTypeA, dataTypeB);
 
 		return dataTypeA === '' || dataTypeB === '' || dataTypeA === dataTypeB;
 	}
 
 	// Updates the connected anchors set on source and target
 	// Creates the edge and add it to the store
-	function connectAnchors(source: Anchor, target: Anchor) {
+	async function connectAnchors(source: Anchor, target: Anchor) {
 		// Don't connect an anchor to itself
 		if (source === target) return false;
 		// Don't connect if the anchors are already connected
@@ -470,7 +470,7 @@
 		};
 
 		// Don't connect if the anchors are of different types
-		if (!checkEdgeDataTypesCompatible(source, target)) return false;
+		if (!await checkEdgeDataTypesCompatible(source, target)) return false;
 
 		if (edgeStyle) edgeConfig.type = edgeStyle;
 		const newEdge = createEdge({ source, target }, source?.edge || null, edgeConfig);
@@ -559,18 +559,25 @@
 	}
 
 	function checkNodeLevelConnections() {
+		const checks: Promise<void>[] = [];
+
 		assignedConnections.forEach((connection, index) => {
-			if (!connection) return;
-			const connected = processConnection(connection);
-			if (connected) connections[index] = null;
+			checks.push((async (c, i): Promise<void> => {
+				if (!c) return;
+				const connected = await processConnection(c);
+				if (connected) connections[i] = null;
+			})(connection, index));
 		});
-		assignedConnections = assignedConnections.filter((connection) => connection !== null);
+
+		Promise.all(checks).then(() => {
+			assignedConnections = assignedConnections.filter((connection) => connection !== null);
+		});
 	}
 
 	function checkDirectConnections() {
-		connections.forEach((connection) => {
+		connections.forEach(async (connection) => {
 			if (!connection) return;
-			processConnection(connection);
+			await processConnection(connection);
 			// if (connected) connections[index] = null;
 		});
 
@@ -588,7 +595,7 @@
 		edgeStore.delete(edgeKey[0]);
 	}
 
-	const processConnection = (connection: [string | number, string | number] | string | number) => {
+	const processConnection = async (connection: [string | number, string | number] | string | number) => {
 		let nodeId: string;
 		let anchorId: string | null;
 		let anchorToConnect: Anchor | null = null;
@@ -635,7 +642,7 @@
 			return false;
 		}
 
-		connectAnchors(anchor, anchorToConnect);
+		await connectAnchors(anchor, anchorToConnect);
 
 		if (anchorToConnect.store && (inputsStore || outputStore)) {
 			if (input && anchorToConnect.type === 'output') {

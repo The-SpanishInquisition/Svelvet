@@ -63,6 +63,11 @@
 			clearAllGraphEdges();
 		}
 	}
+
+	async function dataTypeChecker(a: string, b: string): Promise<boolean> {
+		await new Promise(resolve => setTimeout(resolve, 100));
+		return a === b;
+	}
 </script>
 
 <body>
@@ -76,8 +81,13 @@
 	<button style:float="right" on:click={clearEdges}>Clear edges</button>
 	<Splitpanes on:resize={() => window.dispatchEvent(new Event('resize'))}>
 		<Pane>
-			<Svelvet id="asdf" minimap title="test" snapTo={10}>
-				<!-- dataTypeChecker={(a, b) => a === "pink"} -->
+			<Svelvet
+			id="asdf"
+			minimap
+			title="test"
+			snapTo={10}
+			{dataTypeChecker}
+			>
 				{#each nodes as node}
 					<Node
 						useDefaults

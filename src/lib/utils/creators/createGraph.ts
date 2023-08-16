@@ -9,7 +9,7 @@ import { createBoundsStore } from './createBoundsStore';
 import type { GraphConfig } from '$lib/types';
 import { calculateViewportCenter } from '../calculators/calculateViewPortCenter';
 
-export type DataTypeChecker = (sourceType: string, targetType: string) => boolean;
+export type DataTypeChecker = (sourceType: string, targetType: string) => Promise<boolean>;
 
 export function createGraph(
 	id: GraphKey,
