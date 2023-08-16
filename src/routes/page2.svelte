@@ -65,7 +65,7 @@
 	}
 
 	async function dataTypeChecker(a: string, b: string): Promise<boolean> {
-		await new Promise(resolve => setTimeout(resolve, 100));
+		await new Promise((resolve) => setTimeout(resolve, 100));
 		return a === b;
 	}
 </script>
@@ -82,11 +82,13 @@
 	<Splitpanes on:resize={() => window.dispatchEvent(new Event('resize'))}>
 		<Pane>
 			<Svelvet
-			id="asdf"
-			minimap
-			title="test"
-			snapTo={10}
-			{dataTypeChecker}
+				id="asdf"
+				minimap
+				title="test"
+				snapTo={10}
+				{dataTypeChecker}
+				on:connection={(e) => console.log('CONNECTION', e)}
+				on:disconnection={(e) => console.log('DISCONNECTION', e)}
 			>
 				{#each nodes as node}
 					<Node

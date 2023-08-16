@@ -365,7 +365,7 @@
 	// This can be condensed
 	function startEdge() {
 		// cursor edge color should always be the color
-		// of the node we dragged from
+		// of the anchor we dragged from
 		cursorAnchor.edgeColor = writable(get(edgeColor));
 		cursorAnchor.dataType = anchor.dataType;
 		cursorAnchor.type = anchor.type;
@@ -424,6 +424,7 @@
 		let source: Anchor;
 		let target: Anchor;
 
+		// Enforce `source` as output anchor, `target` as input
 		if (input === output) {
 			if (connectingType === 'input') {
 				source = anchor;
@@ -459,10 +460,16 @@
 	// Updates the connected anchors set on source and target
 	// Creates the edge and add it to the store
 	async function connectAnchors(source: Anchor, target: Anchor) {
+		// source is always an output anchor, target is always an input
+
 		// Don't connect an anchor to itself
 		if (source === target) return false;
+
 		// Don't connect if the anchors are already connected
-		if (get(source.connected).has(anchor)) return false;
+		if (get(source.connected).has(target) || get(target.connected).has(source)) return false;
+
+		// Don't connect to input anchor if it already has a connection
+		// if (get(target.connected).size) return false;
 
 		const edgeConfig: EdgeConfig = {
 			color: source.edgeColor,
@@ -470,7 +477,14 @@
 		};
 
 		// Don't connect if the anchors are of different types
-		if (!await checkEdgeDataTypesCompatible(source, target)) return false;
+		if (!(await checkEdgeDataTypesCompatible(source, target))) return false;
+
+		// If input anchor already has a connection
+		// Remove that connection, and continue with this one
+		const edges = edgeStore.match(target);
+		edges.forEach((edge) => {
+			edgeStore.delete(edge);
+		});
 
 		if (edgeStyle) edgeConfig.type = edgeStyle;
 		const newEdge = createEdge({ source, target }, source?.edge || null, edgeConfig);
@@ -506,6 +520,7 @@
 			$inputsStore[key] = writable(get($inputsStore[key]));
 	}
 
+	// Clear the intermediate connection state
 	function clearLinking(connectionMade: boolean) {
 		if (connectionMade || !$nodeConnectEvent) {
 			$connectingFrom = null;
@@ -562,11 +577,13 @@
 		const checks: Promise<void>[] = [];
 
 		assignedConnections.forEach((connection, index) => {
-			checks.push((async (c, i): Promise<void> => {
-				if (!c) return;
-				const connected = await processConnection(c);
-				if (connected) connections[i] = null;
-			})(connection, index));
+			checks.push(
+				(async (c, i): Promise<void> => {
+					if (!c) return;
+					const connected = await processConnection(c);
+					if (connected) connections[i] = null;
+				})(connection, index)
+			);
 		});
 
 		Promise.all(checks).then(() => {
@@ -595,7 +612,9 @@
 		edgeStore.delete(edgeKey[0]);
 	}
 
-	const processConnection = async (connection: [string | number, string | number] | string | number) => {
+	const processConnection = async (
+		connection: [string | number, string | number] | string | number
+	) => {
 		let nodeId: string;
 		let anchorId: string | null;
 		let anchorToConnect: Anchor | null = null;
