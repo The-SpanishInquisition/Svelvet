@@ -38,7 +38,7 @@
 	export let bgColor: CSSColorString | null = null;
 	export let borderRadius: number | null = null;
 	export let borderColor: CSSColorString | null = null;
-	export let borderWidth: number | null = null;
+	export let borderWidth: string | null = null;
 	export let selectionColor: CSSColorString | null = null;
 	export let textColor: CSSColorString | null = null;
 	export let resizable = false;

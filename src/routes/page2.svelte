@@ -95,6 +95,7 @@
 						useDefaults
 						width={200}
 						height={100}
+						borderWidth="2px"
 						inputs={5}
 						id="n-{node.id}"
 						position={{ x: Math.random() * 500, y: Math.random() * 800 }}

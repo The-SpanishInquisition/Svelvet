@@ -35,7 +35,7 @@ export interface Node {
 	// ariaLabel: string;
 	direction: Writable<'TD' | 'LR'>;
 	borderRadius: Writable<number>;
-	borderWidth: Writable<number>;
+	borderWidth: Writable<string>;
 	connections: Writable<Connections>;
 	bgColor: Writable<CSSColorString | null>;
 	borderColor: Writable<CSSColorString | null>;
@@ -71,7 +71,7 @@ export interface NodeConfig {
 	bgColor?: CSSColorString;
 	useDefaults?: boolean;
 	borderRadius?: number;
-	borderWidth?: number;
+	borderWidth?: string;
 	rotation?: number;
 	textColor?: CSSColorString;
 	connections?: Connections;
