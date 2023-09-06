@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { initialClickPosition } from '$lib/stores/CursorStore';
-	import { getContext } from 'svelte';
+	import { getContext, createEventDispatcher } from 'svelte';
 	import { isArrow } from '$lib/types';
 	import { roundNum } from '$lib/utils';
 	import { tracking } from '$lib/stores/CursorStore';
@@ -17,6 +17,7 @@
 	export let fontColor: CSSColorString | null = null;
 	export let barColor: CSSColorString | null = null;
 	export let bgColor: CSSColorString | null = null;
+	const dispatch = createEventDispatcher();
 
 	$: connected = typeof parameterStore.set !== 'function';
 
@@ -68,6 +69,7 @@
 
 	// Stop sliding on mouseup
 	function stopSlide() {
+		dispatch('sliderReleased');
 		if (previousValue === $parameterStore) {
 			sliderElement.focus();
 			sliderElement.select();
@@ -89,12 +91,13 @@
 	}
 
 	// Update the value based on the direction and increment
-	function updateValue(delta: number, increment = step) {
+	function updateValue(delta: number, button: boolean, increment = step) {
 		if (typeof $parameterStore !== 'number') return;
 		$parameterStore = roundNum(
 			Math.max(min, Math.min($parameterStore + delta * increment, max)),
 			3
 		);
+		if (button) dispatch('buttonClicked');
 	}
 
 	function calculateSlide(cursorChange: number, increment = step) {
@@ -105,9 +108,9 @@
 		if (Math.abs(pixelsMoved) >= pixelsToMove) {
 			const incrementsToMove = Math.floor(Math.abs(pixelsMoved) / pixelsToMove);
 			if (pixelsMoved > 0) {
-				updateValue(incrementsToMove);
+				updateValue(incrementsToMove, false);
 			} else {
-				updateValue(-incrementsToMove);
+				updateValue(-incrementsToMove, false);
 			}
 			pixelsMoved =
 				pixelsMoved > 0
@@ -148,8 +151,8 @@
 	<div class="wrapper" style:color={fontColor}>
 		<button
 			class="button"
-			on:touchstart|stopPropagation={() => updateValue(-1)}
-			on:mousedown|stopPropagation={() => updateValue(-1)}>−</button
+			on:touchstart|stopPropagation={() => updateValue(-1, true)}
+			on:mousedown|stopPropagation={() => updateValue(-1, true)}>−</button
 		>
 		<div class="slider" bind:offsetWidth={sliderWidth}>
 			<label for="slider-input" class="input-label">{label}</label>
@@ -163,14 +166,14 @@
 				value={$parameterStore.toFixed(fixed)}
 				aria-label={label}
 				on:wheel|stopPropagation|preventDefault={(event) => {
-					updateValue(Math.sign(event.deltaY), step);
+					updateValue(Math.sign(event.deltaY), false, step);
 				}}
 				on:keydown|stopPropagation={(e) => {
 					const { key } = e;
 
 					if (isArrow(key)) {
 						e.preventDefault(); // Stops cursor from moving
-						updateValue(key == 'ArrowDown' ? -1 : key == 'ArrowUp' ? 1 : 0);
+						updateValue(key == 'ArrowDown' ? -1 : key == 'ArrowUp' ? 1 : 0, false);
 					}
 
 					if (key === 'Enter') validateInput();
@@ -181,8 +184,8 @@
 		</div>
 		<button
 			class="button"
-			on:touchstart|stopPropagation={() => updateValue(1)}
-			on:mousedown|stopPropagation={() => updateValue(1)}>+</button
+			on:touchstart|stopPropagation={() => updateValue(1, true)}
+			on:mousedown|stopPropagation={() => updateValue(1, true)}>+</button
 		>
 	</div>
 {:else}

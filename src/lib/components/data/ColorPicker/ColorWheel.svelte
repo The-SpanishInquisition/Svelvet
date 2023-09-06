@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
+	import { getContext, createEventDispatcher } from 'svelte';
 	import type {
 		Graph,
 		CustomWritable,
@@ -22,6 +22,7 @@
 
 	export let size = 200;
 	export let parameterStore: CustomWritable<CSSColorString>;
+	const dispatch = createEventDispatcher();
 
 	$: ({ pickerX, pickerY } = colorToPickerXY($parameterStore, size));
 
@@ -91,6 +92,7 @@
 		}
 
 		function onMouseUp() {
+			dispatch('wheelReleased');
 			picking = false;
 			window.removeEventListener('mouseup', onMouseUp);
 		}
