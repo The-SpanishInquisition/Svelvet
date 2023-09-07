@@ -280,7 +280,8 @@
 		activeGroup={graph.activeGroup}
 		editing={graph.editing}
 		initialNodePositions={graph.initialNodePositions}
-		on:nodeClicked
+		on:nodeClickReleased
+		on:nodeDragReleased
 		on:nodeMount
 		on:nodeReleased
 		on:duplicate

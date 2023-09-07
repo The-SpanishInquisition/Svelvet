@@ -147,7 +147,7 @@
 		e.preventDefault();
 
 		// Dispatch our nodeClicked event for developer use
-		dispatch('nodeClicked', { node, e });
+		dispatch('nodeClickReleased', { node, e });
 
 		// If the node or graph is locked, don't do anything
 		if ($locked || $nodeLock) return; // If the node is locked, don't do anything
@@ -218,7 +218,10 @@
 		const mouseDeltaX = cursorPosition.x - $initialClickPosition.x;
 		const mouseDeltaY = cursorPosition.y - $initialClickPosition.y;
 		const combinedDelta = Math.abs(mouseDeltaX) + Math.abs(mouseDeltaY);
-		if (combinedDelta < 4) dispatch('nodeReleased', { e, node });
+		// Fix for release event sent when node clicked and has been moved from spawn point
+		if (combinedDelta > 4 && $initialClickPosition.x + $initialClickPosition.y !== 0) {
+			dispatch('nodeDragReleased', { e, node });
+		}
 
 		$nodeConnectEvent = e;
 	}
