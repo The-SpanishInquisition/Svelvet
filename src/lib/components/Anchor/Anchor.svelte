@@ -536,7 +536,7 @@
 	}
 
 	// Destroy the edge and disconnect the anchors/stores
-	function destroy() {
+	function destroy(silent = true) {
 		// return;
 		edgeStore.delete('cursor');
 
@@ -544,7 +544,7 @@
 		const connections = edgeStore.match(anchor);
 
 		// Delete them from the store (silently!)
-		connections.forEach((edge) => edgeStore.delete(edge, true));
+		connections.forEach((edge) => edgeStore.delete(edge, silent));
 
 		clearLinking(false);
 		disconnectStore();
@@ -558,7 +558,7 @@
 
 		if (source.type === 'input') return;
 
-		destroy();
+		destroy(false);
 
 		if (source.type === 'output') {
 			createCursorEdge(source, cursorAnchor, true);
