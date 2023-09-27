@@ -543,8 +543,8 @@
 		// Get all edges connected to this anchor
 		const connections = edgeStore.match(anchor);
 
-		// Delete them from the store
-		connections.forEach((edge) => edgeStore.delete(edge));
+		// Delete them from the store (silently!)
+		connections.forEach((edge) => edgeStore.delete(edge, true));
 
 		clearLinking(false);
 		disconnectStore();
