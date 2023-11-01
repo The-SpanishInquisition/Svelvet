@@ -13,7 +13,8 @@
 		InputStore,
 		InputType,
 		Node,
-		NodeKey, OutputStore
+		NodeKey,
+		OutputStore
 	} from '$lib/types';
 	import { createAnchor, createEdge, generateOutput } from '$lib/utils/creators';
 	import type { ComponentType } from 'svelte';
@@ -463,7 +464,7 @@
 		if (source === target) return false;
 
 		// Dont connect anchors from the same node
-		if(source.node.id === target.node.id) return false;
+		if (source.node.id === target.node.id) return false;
 
 		// Don't connect if the anchors are already connected
 		if (get(source.connected).has(target) || get(target.connected).has(source)) return false;
