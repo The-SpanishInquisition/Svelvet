@@ -1,14 +1,9 @@
 <script lang="ts">
-	import { Svelvet, Node, Anchor, type Graph } from '$lib';
-	import type { AnchorKey, Anchor as AnchorType, CSSColorString, NodeKey } from '$lib/types';
-	import Connector from '../example-components/Connector.svelte';
-	import ThemeToggle from '$lib/components/ThemeToggle/ThemeToggle.svelte';
-	import { Splitpanes, Pane } from 'svelte-splitpanes';
-	import { get, writable, type Writable } from 'svelte/store';
-	import Background from '$lib/containers/Background/Background.svelte';
-	import { createEdge } from '$lib/utils';
-	import { source } from '$lib/stores';
+	import { Anchor, Node, Svelvet, type Graph } from '$lib';
 	import DefaultAnchor from '$lib/components/Anchor/DefaultAnchor.svelte';
+	import Background from '$lib/containers/Background/Background.svelte';
+	import type { AnchorKey, Anchor as AnchorType, CSSColorString, NodeKey } from '$lib/types';
+	import { Pane, Splitpanes } from 'svelte-splitpanes';
 
 	let totalNodes = 0;
 	let widthCount = 1;
@@ -161,7 +156,7 @@
 				<Background dotColor="red" slot="background" />
 			</Svelvet>
 		</Pane>
-		<Pane>
+		<!-- <Pane>
 			<Svelvet
 				id="asdf2"
 				minimap
@@ -171,12 +166,8 @@
 				bind:connectAnchorIds
 				bind:clearAllGraphEdges
 			>
-				<!-- on:connection={(e) => console.log('CONNECTION', e)} -->
-				<!-- on:disconnection={(e) => console.log('DISCONNECTION', e)} -->
-				<!-- Special anchor for accessing connection functions -->
 				<div class="hidden" />
 				{#each nodes as node}
-					<!-- {#key resetGraph} -->
 					<Node
 						id="n-{node.id}"
 						useDefaults
@@ -185,15 +176,12 @@
 						inputs={4}
 					>
 						<Anchor nodeConnect id="a-{node.id}" />
-						<!-- connections={get(node.conns)} -->
-						<!-- connections={[[`n-${(node.id+1)%5}`, `a-${(node.id+1)%5}`]]} -->
 					</Node>
-					<!-- {/key} -->
 				{/each}
 				<ThemeToggle slot="toggle" />
 				<Background dotColor="blue" slot="background" />
 			</Svelvet>
-		</Pane>
+		</Pane> -->
 	</Splitpanes>
 </body>
 

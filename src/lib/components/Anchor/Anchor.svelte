@@ -1,32 +1,28 @@
 <script context="module" lang="ts">
-	import DefaultAnchor from './DefaultAnchor.svelte';
-	import Edge from '../Edge/Edge.svelte';
-	import EdgeContext from '../Edge/EdgeContext.svelte';
-	import { onMount, getContext, onDestroy, afterUpdate } from 'svelte';
-	import { writable, get } from 'svelte/store';
-	import { createEdge, createAnchor, generateOutput } from '$lib/utils/creators';
-	import { createEventDispatcher } from 'svelte';
-	import type {
-		Graph,
-		Node,
-		Connections,
-		CSSColorString,
-		EdgeStyle,
-		EdgeConfig,
-		WritableEdge,
-		CustomEdgeKey,
-		EdgeStore
-	} from '$lib/types';
 	import type {
 		Anchor,
-		Direction,
+		AnchorConnectionEvent,
 		AnchorKey,
-		CustomWritable,
-		AnchorConnectionEvent
+		CSSColorString,
+		ConnectingFrom,
+		Connections,
+		Direction,
+		EdgeConfig,
+		EdgeStyle,
+		Graph,
+		InputStore,
+		InputType,
+		Node,
+		NodeKey, OutputStore
 	} from '$lib/types';
-	import type { InputType, NodeKey, OutputStore, InputStore, ConnectingFrom } from '$lib/types';
+	import { createAnchor, createEdge, generateOutput } from '$lib/utils/creators';
 	import type { ComponentType } from 'svelte';
-	import type { Writable, Readable } from 'svelte/store';
+	import { afterUpdate, createEventDispatcher, getContext, onDestroy, onMount } from 'svelte';
+	import type { Writable } from 'svelte/store';
+	import { get, writable } from 'svelte/store';
+	import Edge from '../Edge/Edge.svelte';
+	import EdgeContext from '../Edge/EdgeContext.svelte';
+	import DefaultAnchor from './DefaultAnchor.svelte';
 
 	let animationFrameId: number;
 
@@ -281,7 +277,6 @@
 
 	async function attemptConnection(source: Anchor, target: Anchor, e: MouseEvent | TouchEvent) {
 		const success = await connectAnchors(source, target);
-
 		if (success) {
 			connectStores();
 		}
@@ -338,7 +333,7 @@
 
 		if (hovering) {
 			// Cannot connect inputs to inputs / outputs to outputs
-			if (anchor.type === cursorAnchor.type) {
+			if (anchor.type === cursorAnchor.type || anchor.node.id === cursorAnchor.node.id) {
 				cursorEdge.color.set('red');
 				cursorEdge.animated.set(true);
 				cursorEdge.label?.text.set('');
@@ -369,6 +364,8 @@
 		cursorAnchor.edgeColor = writable(get(edgeColor));
 		cursorAnchor.dataType = anchor.dataType;
 		cursorAnchor.type = anchor.type;
+		cursorAnchor.node = anchor.node;
+		cursorAnchor.id = anchor.id;
 
 		if (input === output) {
 			$connectingFrom = { anchor, store: null, key: null };
@@ -464,6 +461,9 @@
 
 		// Don't connect an anchor to itself
 		if (source === target) return false;
+
+		// Dont connect anchors from the same node
+		if(source.node.id === target.node.id) return false;
 
 		// Don't connect if the anchors are already connected
 		if (get(source.connected).has(target) || get(target.connected).has(source)) return false;
