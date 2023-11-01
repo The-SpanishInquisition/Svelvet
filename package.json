@@ -1,6 +1,6 @@
 {
 	"name": "blix_svelvet",
-	"version": "1.0.20",
+	"version": "1.0.21",
 	"description": "A lightweight Svelte component library for building dynamic, node-based user interfaces",
 	"keywords": [
 		"svelte",
